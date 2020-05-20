@@ -6,8 +6,10 @@ import android.graphics.Paint;
 
 public class Bullet extends SpriteObject {
     private double life;
+    private double speed = 800;
 
-    public Bullet(double x, double y, int size, double direction, double speed) {
+    public Bullet(GameView game, double x, double y, double direction) {
+        super(game, x, y);
         this.x = x;
         this.y = y;
         this.collisionLayer = "PLAYER";
@@ -18,15 +20,21 @@ public class Bullet extends SpriteObject {
         width = -1;
         height = -1;
         life = 200;
+        radius = 10;
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void update(double elapsed_time) {
+        super.update(elapsed_time);
         life -= 1;
         if (life <= 0) {
             dead = true;
         }
+    }
+
+    @Override
+    public void onCollide(SpriteObject otherObject) {
+
     }
 
     @Override

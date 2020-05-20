@@ -12,18 +12,16 @@ public class Asteroid extends SpriteObject {
     private List<Double> offsets;
     private Double rotation;
     private Integer size;
-    private Double dx, dy;
+    private double speed;
 
-    public Asteroid(double x, double y, int size, double direction, double speed) {
-        Random rng = new Random();
+    public Asteroid(GameView game, double x, double y, int size, double direction, double speed) {
+        super(game, x, y);
 
         offsets = new ArrayList<Double>();
-        for (int i = 5 + rng.nextInt(6); i >= 0; i--) {
-            offsets.add(0.7 + rng.nextDouble()*0.5);
+        for (int i = 5 + game.rng.nextInt(6); i >= 0; i--) {
+            offsets.add(0.7 + game.rng.nextDouble()*0.5);
         }
 
-        this.x = x;
-        this.y = y;
         this.rotation = 0.;
         this.collisionLayer = "ASTEROID";
 
@@ -32,15 +30,37 @@ public class Asteroid extends SpriteObject {
 
         this.dx = Math.cos(direction) * speed;
         this.dy = Math.sin(direction) * speed;
+        this.speed = speed;
 
         width = -1;
         height = -1;
     }
 
     @Override
-    public void update() {
-        super.update();
+    public void update(double elapsed_time) {
+        super.update(elapsed_time);
         rotation += 0.01;
+    }
+
+    @Override
+    public void onCollide(SpriteObject otherObject) {
+        if (otherObject instanceof Bullet) {
+            dead = true;
+            game.score += (int) (100 * Math.pow(2, 2-size));
+            if (size > 0) {
+                game.spawn(new Asteroid(game, x, y, size-1,
+                        game.rng.nextDouble() * 2 * Math.PI,
+                        speed * 0.8 + game.rng.nextDouble() * 0.4));
+                game.spawn(new Asteroid(game, x, y, size-1,
+                        game.rng.nextDouble() * 2 * Math.PI,
+                        speed * 0.8 + game.rng.nextDouble() * 0.4));
+                if (game.rng.nextDouble() < 0.1 * size) {
+                    game.spawn(new Asteroid(game, x, y, size-1,
+                            game.rng.nextDouble() * 2 * Math.PI,
+                            speed * 0.8 + game.rng.nextDouble() * 0.4));
+                }
+            }
+        }
     }
 
     @Override

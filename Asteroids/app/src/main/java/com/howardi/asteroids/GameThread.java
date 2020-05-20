@@ -1,12 +1,15 @@
 package com.howardi.asteroids;
 
 import android.graphics.Canvas;
+import android.os.SystemClock;
 import android.view.SurfaceHolder;
 
 public class GameThread extends Thread {
     private SurfaceHolder surfaceHolder;
     private GameView gameView;
     private boolean running;
+    private long last_time;
+    private long now_time;
 
     public GameThread(SurfaceHolder surfaceHolder, GameView gameView) {
         super();
@@ -17,6 +20,7 @@ public class GameThread extends Thread {
 
     public void setRunning(boolean running) {
         this.running = running;
+        last_time = SystemClock.uptimeMillis();
     }
 
     @Override
@@ -28,7 +32,9 @@ public class GameThread extends Thread {
                 canvas = this.surfaceHolder.lockCanvas();
 
                 synchronized (surfaceHolder) {
-                    this.gameView.update();
+                    now_time = SystemClock.uptimeMillis();
+                    this.gameView.update(now_time - last_time);
+                    last_time = now_time;
                     this.gameView.draw(canvas);
                 }
             } catch (Exception e) {

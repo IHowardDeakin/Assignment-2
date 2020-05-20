@@ -7,8 +7,15 @@ public abstract class SpriteObject {
     public double x, y;
     public double dx, dy;
     public double radius;
-    public int width, height;
+    protected int width, height;
     public boolean dead = false;
+    protected GameView game;
+
+    public SpriteObject(GameView game, double x, double y) {
+        this.game = game;
+        this.x = x;
+        this.y = y;
+    }
 
     public abstract void drawSprite(Canvas canvas, double x, double y);
 
@@ -43,9 +50,9 @@ public abstract class SpriteObject {
         }
     };
 
-    public void update() {
-        x += dx;
-        y += dy;
+    public void update(double elapsed_time) {
+        x += dx * elapsed_time;
+        y += dy * elapsed_time;
         if (width != -1 && height != -1) {
             if (x < 0) {
                 x += width;
@@ -72,4 +79,6 @@ public abstract class SpriteObject {
             return x_gap * x_gap + y_gap * y_gap < r_gap * r_gap;
         }
     }
+
+    public abstract void onCollide(SpriteObject otherObject);
 }
