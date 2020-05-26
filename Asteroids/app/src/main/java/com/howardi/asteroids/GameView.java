@@ -3,6 +3,7 @@ package com.howardi.asteroids;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -25,7 +26,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         spriteObjects = new ArrayList<SpriteObject>();
         score = 0;
         rng = new Random();
-        spriteObjects.add(new Bullet(this, 100, 100, 3));
+        spawn(new Player(this, 500, 500));
     }
 
     public void spawn(SpriteObject sprite) {
@@ -82,5 +83,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             }
             retry = false;
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            double x = event.getX();
+            double y = event.getY();
+            Log.d("TEST - TOUCH", Double.toString(x) + "," + Double.toString(y));
+            for (SpriteObject sprite: spriteObjects) {
+                if (sprite instanceof Player) {
+                    ((Player) sprite).accelerateTowards(x, y);
+                }
+            }
+
+            return true;
+        }
+        return false;
     }
 }
