@@ -34,7 +34,7 @@ public class Bullet extends SpriteObject {
 
     @Override
     public void onCollide(SpriteObject otherObject) {
-
+        if (otherObject instanceof Asteroid) dead = true;
     }
 
     @Override
