@@ -2,5 +2,7 @@
     <string name="app_name">Asteroids</string>
     <string name="start_game">New Game</string>
     <string name="high_scores">High Scores</string>
-    <string name="title">Notteroids</string>
+    <string name="title">Nosteroids</string>
+    <string name="back_button">Back</string>
+    <string name="high_score_key">SCORES</string>
 </resources>

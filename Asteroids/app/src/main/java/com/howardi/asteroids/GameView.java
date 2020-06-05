@@ -1,6 +1,7 @@
 package com.howardi.asteroids;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,6 +12,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -22,9 +24,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public Random rng;
     public double pointerX, pointerY;
     public boolean touching;
+    public int lives;
+
+    private GameActivity context;
 
     public GameView(Context context) {
         super(context);
+        this.context = (GameActivity) context;
 
         getHolder().addCallback(this);
         setFocusable(true);
@@ -35,6 +41,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         pointerX = 0;
         pointerY = 0;
         touching = false;
+        lives = 3;
         wave = 1;
 
         start(wave + 2);
@@ -43,6 +50,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public void start(int asteroids) {
         int width = Resources.getSystem().getDisplayMetrics().widthPixels;
         int height = Resources.getSystem().getDisplayMetrics().heightPixels;
+
+        spriteObjects.clear(); // Reset every time a new wave starts
+
         spawn(new Player(this, width/2, height/2));
         double x, y;
         for (int i = 0; i < asteroids; i++) {
@@ -54,7 +64,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 continue;
             }
             spawn(new Asteroid(this, x, y, Math.min(1 + rng.nextInt(wave+1), 3),
-                    rng.nextDouble() * Math.PI * 2,rng.nextInt()));
+                    rng.nextDouble() * Math.PI * 2, 200 + rng.nextInt(20 * wave)));
         }
     }
 
@@ -74,10 +84,34 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             object.update(seconds);
         }
 
+        int asteroids = 0;
         for (int i = spriteObjects.size() - 1; i >= 0; i--) {
             if (spriteObjects.get(i).dead) {
+                if (spriteObjects.get(i) instanceof Player) {
+                    lives -= 1;
+                    start(wave+2);
+                    if (lives <= 0) {
+                        SharedPreferences sharedPref = getContext().getSharedPreferences(getContext().getString(R.string.high_score_key),
+                                Context.MODE_PRIVATE);
+                        String scores = sharedPref.getString(getContext().getString(R.string.high_score_key), "2000 Bruce|1000 Lee");
+                        scores += "|" + Integer.toString(score);
+                        SharedPreferences.Editor editor = sharedPref.edit();
+                        editor.putString(getContext().getString(R.string.high_score_key), scores);
+                        editor.commit();
+                        context.finish();
+                    }
+                    return; // Exit the entire function, just abandon the rest of the update process as the entire wave resets
+                }
                 spriteObjects.remove(i);
+            } else if (spriteObjects.get(i) instanceof Asteroid) {
+                asteroids++;
             }
+        }
+
+        if (asteroids == 0) {
+            wave += 1;
+            score += 1000*wave;
+            start(wave + 2);
         }
     }
 
@@ -92,6 +126,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         scoreText.setColor(Color.WHITE);
         scoreText.setTextSize(50);
         canvas.drawText("SCORE: " + Integer.toString(score), 50, 100, scoreText);
+        canvas.drawText("LIVES: " + Integer.toString(lives), 50, 180, scoreText);
     }
 
     @Override

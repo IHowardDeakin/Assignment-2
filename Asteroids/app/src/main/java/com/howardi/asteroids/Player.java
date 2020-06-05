@@ -84,6 +84,8 @@ public class Player extends SpriteObject {
 
     @Override
     public void onCollide(SpriteObject otherObject) {
-
+        if (otherObject instanceof Asteroid) {
+            dead = true;
+        }
     }
 }
