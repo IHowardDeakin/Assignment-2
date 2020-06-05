@@ -32,4 +32,9 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, GameActivity.class);
         startActivity(intent);
     }
+
+    public void onScoresClick(View view) {
+        Intent intent = new Intent(MainActivity.this, ScoresActivity.class);
+        startActivity(intent);
+    }
 }

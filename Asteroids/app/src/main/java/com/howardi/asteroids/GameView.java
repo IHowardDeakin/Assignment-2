@@ -18,6 +18,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private GameThread gameThread;
     private List<SpriteObject> spriteObjects;
     public int score;
+    public int wave;
     public Random rng;
     public double pointerX, pointerY;
     public boolean touching;
@@ -34,8 +35,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         pointerX = 0;
         pointerY = 0;
         touching = false;
+        wave = 1;
 
-        start(3);
+        start(wave + 2);
     }
 
     public void start(int asteroids) {
@@ -51,8 +53,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 i--;
                 continue;
             }
-            spawn(new Asteroid(this, x, y, 2, rng.nextDouble() * Math.PI * 2,
-                    200));
+            spawn(new Asteroid(this, x, y, Math.min(1 + rng.nextInt(wave+1), 3),
+                    rng.nextDouble() * Math.PI * 2,rng.nextInt()));
         }
     }
 
