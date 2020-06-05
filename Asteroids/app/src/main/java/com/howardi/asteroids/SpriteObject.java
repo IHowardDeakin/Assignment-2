@@ -24,7 +24,10 @@ public abstract class SpriteObject {
     public abstract void drawSprite(Canvas canvas, double x, double y);
 
     public void draw(Canvas canvas) {
-        if (width == -1 || height == -1) {
+        // There was a bug if these were set to == -1, causing them to sometimes think the height
+        // and width are 0 which breaks the wrapping code. We detect here to ensure the actual
+        // drawable area is what is detected.
+        if (width <= 0 || height <= 0) {
             width = canvas.getWidth();
             height = canvas.getHeight();
         }
