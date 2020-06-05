@@ -17,6 +17,10 @@ public abstract class SpriteObject {
         this.y = y;
     }
 
+    public String toString() {
+        return this.getClass().getName() + "(" + Double.toString(x) + "," + Double.toString(y) + ")";
+    };
+
     public abstract void drawSprite(Canvas canvas, double x, double y);
 
     public void draw(Canvas canvas) {
