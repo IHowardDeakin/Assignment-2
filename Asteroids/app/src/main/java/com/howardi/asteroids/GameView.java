@@ -1,7 +1,10 @@
 package com.howardi.asteroids;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -16,6 +19,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private List<SpriteObject> spriteObjects;
     public int score;
     public Random rng;
+    public double pointerX, pointerY;
+    public boolean touching;
 
     public GameView(Context context) {
         super(context);
@@ -26,7 +31,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         spriteObjects = new ArrayList<SpriteObject>();
         score = 0;
         rng = new Random();
-        spawn(new Player(this, 500, 500));
+        pointerX = 0;
+        pointerY = 0;
+        touching = false;
+
+        start(3);
+    }
+
+    public void start(int asteroids) {
+        int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+        int height = Resources.getSystem().getDisplayMetrics().heightPixels;
+        spawn(new Player(this, width/2, height/2));
+        double x, y;
+        for (int i = 0; i < asteroids; i++) {
+            x = rng.nextDouble() * width;
+            y = rng.nextDouble() * height;
+            // If it's too close, retry
+            if ((x-width/2)*(x-width/2) + (y-height/2)*(y-height/2) < 300) {
+                i--;
+                continue;
+            }
+            spawn(new Asteroid(this, x, y, 2, rng.nextDouble() * Math.PI * 2,
+                    200));
+        }
     }
 
     public void spawn(SpriteObject sprite) {
@@ -37,13 +64,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         double seconds = elapsed_time/1000.0;
         for (SpriteObject object: spriteObjects) {
             for (SpriteObject object2: spriteObjects) {
-                if (!object.equals(object2) && object.collide(object2)) {
+                if (!object.equals(object2) && !object.dead && !object2.dead && object.collide(object2)) {
                     object.onCollide(object2);
                     object2.onCollide(object);
                 }
             }
             object.update(seconds);
         }
+
         for (int i = spriteObjects.size() - 1; i >= 0; i--) {
             if (spriteObjects.get(i).dead) {
                 spriteObjects.remove(i);
@@ -91,18 +119,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            double x = event.getX();
-            double y = event.getY();
-            Log.d("TEST - TOUCH", Double.toString(x) + "," + Double.toString(y));
-            for (SpriteObject sprite: spriteObjects) {
-                if (sprite instanceof Player) {
-                    ((Player) sprite).accelerateTowards(x, y);
-                }
-            }
-
-            return true;
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                pointerX = event.getX();
+                pointerY = event.getY();
+                touching = true;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                pointerX = event.getX();
+                pointerY = event.getY();
+                break;
+            case MotionEvent.ACTION_UP:
+                touching = false;
         }
-        return false;
+
+        return true;
     }
 }

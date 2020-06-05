@@ -26,6 +26,10 @@ public class Player extends SpriteObject {
 
     @Override
     public void update(double elapsed_time) {
+        if (game.touching) {
+            accelerateTowards(game.pointerX, game.pointerY);
+        }
+
         dx = Math.cos(direction) * speed;
         dy = Math.sin(direction) * speed;
         super.update(elapsed_time);
@@ -38,13 +42,11 @@ public class Player extends SpriteObject {
             cooldownTime -= cooldown;
             game.spawn(new Bullet(game, x, y, direction));
         }
-
-
     }
 
     public void accelerateTowards(double p_x, double p_y) {
         double directionTowards = Math.atan2(p_y-y, p_x-x);
-        double acceleration = 250;
+        double acceleration = 30;
 
         dx = Math.cos(direction) * speed + Math.cos(directionTowards) * acceleration;
         dy = Math.sin(direction) * speed + Math.sin(directionTowards) * acceleration;
