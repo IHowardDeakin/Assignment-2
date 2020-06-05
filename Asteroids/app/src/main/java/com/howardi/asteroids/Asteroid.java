@@ -50,14 +50,14 @@ public class Asteroid extends SpriteObject {
             if (size > 0) {
                 game.spawn(new Asteroid(game, x, y, size-1,
                         game.rng.nextDouble() * 2 * Math.PI,
-                        speed * 0.8 + game.rng.nextDouble() * 0.4));
+                        speed + game.rng.nextDouble() * 0.3));
                 game.spawn(new Asteroid(game, x, y, size-1,
                         game.rng.nextDouble() * 2 * Math.PI,
-                        speed * 0.8 + game.rng.nextDouble() * 0.4));
+                        speed + game.rng.nextDouble() * 0.3));
                 if (game.rng.nextDouble() < 0.1 * size) {
                     game.spawn(new Asteroid(game, x, y, size-1,
                             game.rng.nextDouble() * 2 * Math.PI,
-                            speed * 0.8 + game.rng.nextDouble() * 0.4));
+                            speed * 1.1 + game.rng.nextDouble() * 0.4));
                 }
             }
         }
